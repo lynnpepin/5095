@@ -1,7 +1,7 @@
 import unittest as ut
 import numpy as np
 
-from main import Node, Swarm, polar_to_xy
+from toolkit import Node, Swarm, polar_to_xy
 
 class NodeTests(ut.TestCase):
     def test_updated_hist(self):

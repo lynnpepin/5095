@@ -1,7 +1,7 @@
 import unittest as ut
 import numpy as np
 
-from main import Node, polar_to_xy
+from main import Node, Swarm, polar_to_xy
 
 class NodeTests(ut.TestCase):
     def test_updated_hist(self):
@@ -39,7 +39,18 @@ class NodeTests(ut.TestCase):
             self.assertEqual(some_node.X[:length], xs[::-1])
             self.assertEqual(some_node.Y[:length], ys[::-1])
 
+class SwarmTests(ut.TestCase):
+    def test_swarm_lengths(self):
+        for _ in range(100):
+            num_nodes = np.random.randint(1,40)
+            hist_length = np.random.randint(1,40)
+            swarm = Swarm(N=num_nodes, hist_length=hist_length)
 
+            # Test number of nodes and hist_length
+            self.assertEqual(len(swarm.nodes), num_nodes)
+            for node in swarm.nodes:
+                self.assertEqual(len(node.X), hist_length)
+                self.assertEqual(len(node.Y), hist_length)
 
 class UtilTests(ut.TestCase):
     def test_polar_to_xy(self):

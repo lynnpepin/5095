@@ -37,22 +37,38 @@ class Node:
         self.X.insert(0, x)
         self.Y.insert(0, y)
 
+
 class Swarm:
     def __init__(
         self,
         N: int = 20,
         get_radius = lambda: np.random.normal(100, 10),
-        get_theta  = lambda: np.random.uniform(0, 2*np.pi)
+        get_theta  = lambda: np.random.uniform(0, 2*np.pi),
+        hist_length = 20
     ):
-        print("hey")
-        #nodes = [
-        #    Node(
+
+        self._get_radius = get_radius
+        self._get_theta = get_theta
+        self.hist_length = hist_length
+
+        # Instantiate nodes
+        self.nodes = []
+        for _ in range(N):
+            x, y = polar_to_xy(
+                r = self._get_radius(),
+                theta = self._get_radius()
+            )
+            new_node = Node(x=x, y=y, hist_length=hist_length)
+            self.nodes.append(new_node)
+
+    def update(self):
+        pass
 
 
 def main(width: int = 360, height: int = 360):
     # See https://dr0id.bitbucket.io/legacy/pygame_tutorial00.html
     pygame.init()
-    pygame.display.set_caption("5095 go vroom")
+    pygame.display.set_caption("5390 go vroom")
     screen = pygame.display.set_mode((width,height))
 
     # Instantiate nodes

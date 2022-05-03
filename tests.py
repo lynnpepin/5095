@@ -3,6 +3,8 @@ import numpy as np
 
 from toolkit import Node, Swarm, polar_to_xy
 
+from palette import S16, s16_raw, interpolate_color
+
 class NodeTests(ut.TestCase):
     def test_updated_hist(self):
         for _ in range(10):
@@ -71,6 +73,25 @@ class UtilTests(ut.TestCase):
             polar_to_xy(0, 1000000000000000000),
             (0,0)
         )
+
+class PaletteTests(ut.TestCase):
+    def test_sanity_s16_raw(self):
+        self.assertEqual(s16_raw.shape, (16, 3))
+    
+    def test_sanity_s16(self):
+        this_should_work = S16.lime + S16.navy
+    
+    def test_sanity_interpolate(self):
+        for color1 in s16_raw:
+            for color2 in s16_raw:
+                np.testing.assert_equal(
+                    color1,
+                    interpolate_color(color1, color2, r=0)
+                )
+                np.testing.assert_equal(
+                    color2,
+                    interpolate_color(color1, color2, r=1)
+                )
 
 
 

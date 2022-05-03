@@ -1,3 +1,4 @@
+import numpy as np
 
 def polar_to_xy(r: float, theta: float = 0):
     """Convert polar coordinates in (r, theta) to cartesian (x, y).

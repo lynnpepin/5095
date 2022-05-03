@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import numpy as np
 
 def interpolate_color(c1, c2, r):
     return np.array(c1) * (1-r) + np.array(c2) * r
@@ -37,7 +38,7 @@ class S16:
     lime   = np.array((167, 240, 112))
     green  = np.array((56,  183, 100))
     teal   = np.array((37,  113, 121))
-    navy   = np.array(41,  54,  111)()
+    navy   = np.array((41,  54,  111))
     blue   = np.array((59,  93,  201))
     cerulean = np.array((65,  166, 246))
     cyan = np.array((115, 239, 247))

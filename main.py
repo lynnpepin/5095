@@ -25,21 +25,26 @@ def main(width: int = 360, height: int = 360, fps: int = 60):
     clock = pygame.time.Clock()
     # dt is used in game logic. ideally is 1/fps
 
-    swarm = Swarm(N = 20)
+    swarm = Swarm(N = 20, screen=screen)
 
     # Main game logic loop    
     while True:
         screen.fill(S16.black)
+
+        #### Handle controls
         for ev in pygame.event.get():
             if ev.type == pygame.QUIT:
                 return 0
         
-        # todo: render nodes
-    
-    # fixed dt = visual inconsistency but simulated consistency
-    # setting dt as `dt = clock.tick(FPS)/1000` gives us the opposite
-    clock.tick(FPS) 
-    pygame.display.update()
+        #### Handle simulation
+        swarm.draw()
+            # todo: render nodes
+
+        #### Update frames
+        # fixed dt = visual inconsistency but simulated consistency
+        # setting dt as `dt = clock.tick(FPS)/1000` gives us the opposite
+        clock.tick(fps) 
+        pygame.display.update()
 
 
 

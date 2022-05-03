@@ -37,8 +37,8 @@ def main(width: int = 360, height: int = 360, fps: int = 60):
                 return 0
         
         #### Handle simulation
+        swarm.update()
         swarm.draw()
-            # todo: render nodes
 
         #### Update frames
         # fixed dt = visual inconsistency but simulated consistency

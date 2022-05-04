@@ -1,7 +1,7 @@
 import unittest as ut
 import numpy as np
 
-from toolkit import Node, Swarm, polar_to_xy
+from toolkit import Node, Swarm, polar_to_xy, center_origin
 
 from palette import S16, s16_raw, interpolate_color
 
@@ -73,6 +73,17 @@ class UtilTests(ut.TestCase):
             polar_to_xy(0, 1000000000000000000),
             (0,0)
         )
+    
+    def test_center_origin_sanity(self):
+        self.assertEqual(
+            center_origin((0,0),360,360),
+            (180, 180)
+        )
+        self.assertEqual(
+            center_origin((-1,-1),400,400),
+            (199, 199)
+        )
+
 
 class PaletteTests(ut.TestCase):
     def test_sanity_s16_raw(self):

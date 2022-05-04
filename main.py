@@ -13,19 +13,19 @@ import numpy as np
 
 import pygame
 
-from toolkit import Node, Swarm, polar_to_xy
+from toolkit import Node, Swarm, polar_to_xy, center_origin
 from palette import S16, interpolate_color
 
 def main(width: int = 360, height: int = 360, fps: int = 60):
     # See https://dr0id.bitbucket.io/legacy/pygame_tutorial00.html
     pygame.init()
-    pygame.display.set_caption("5390 go vroom")
+    pygame.display.set_caption("Particles")
     screen = pygame.display.set_mode((width,height))
     dt = 1/fps
     clock = pygame.time.Clock()
     # dt is used in game logic. ideally is 1/fps
 
-    swarm = Swarm(N = 20, screen=screen)
+    swarm = Swarm(N = 40, screen=screen, hist_length=100)
 
     # Main game logic loop    
     while True:
@@ -38,7 +38,10 @@ def main(width: int = 360, height: int = 360, fps: int = 60):
         
         #### Handle simulation
         swarm.update()
-        swarm.draw()
+        swarm.draw(
+            screen,
+            transform = lambda coord: center_origin(coord, width, height)
+        )
 
         #### Update frames
         # fixed dt = visual inconsistency but simulated consistency
@@ -52,13 +55,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="")
     parser.add_argument(
         "--width","-scrw", 
-        default=[360],
+        default=[600],
         help="Integer argument.",
         type=int, nargs=1
     )
     parser.add_argument(
         "--height","-scrh", 
-        default=[360],
+        default=[600],
         help="Integer argument.",
         type=int, nargs=1
     )

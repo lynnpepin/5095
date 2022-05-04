@@ -17,6 +17,23 @@ def polar_to_xy(r: float, theta: float = 0):
     """
     return (r*np.cos(theta), r*np.sin(theta))
 
+def center_origin(coord, width=360, height=360):
+    """Transform an (x,y) coordinate so (0,0) is centered
+    according to width, height.
+
+    E.g. center_origin((100,50), 400, 300) = (300,200)
+
+    :param coord: Tuple of (x,y)
+    :type coord: Tuple[float, float]
+    :param width: Width of screen, defaults to 360
+    :type width: int, optional
+    :param height: Width of screen, defaults to 360
+    :type height: int, optional
+    :return: _description_
+    :rtype: _type_
+    """
+    return (coord[0] + width/2, coord[1] + width/2)
+
 class Node:
     def __init__(
         self,
@@ -39,7 +56,7 @@ class Node:
         self.X.insert(0, x)
         self.Y.insert(0, y)
     
-    def draw_tail(self, screen = None):
+    def draw_tail(self, screen = None, transform = lambda x: x):
         if screen is None:
             screen = self.screen
         
@@ -52,17 +69,20 @@ class Node:
             pygame.draw.line(
                 screen,
                 color,
-                (self.X[ii], self.Y[ii]),
-                (self.X[ii + 1], self.Y[ii + 1]),
+                transform((self.X[ii], self.Y[ii])),
+                transform((self.X[ii + 1], self.Y[ii + 1])),
                 width = 2
             )
     
-    def draw(self, screen = None):
+    def draw(self, screen = None, transform = lambda x: x):
         if screen is None:
             screen = self.screen
         
         pygame.draw.circle(
-            screen, S16.white, center=(self.X[0], self.Y[0]), radius=2
+            screen,
+            S16.white,
+            center = transform((self.X[0], self.Y[0])),
+            radius = 2
         )
 
 
@@ -92,7 +112,7 @@ class Swarm:
             new_node = Node(x=x, y=y, hist_length=hist_length)
             self.nodes.append(new_node)
 
-    def update(self, dt = 1/60, noise = lambda: np.random.normal(0, .1)):
+    def update(self, dt = 1/60, noise = lambda: np.random.normal(0, .5)):
         # todo: define dr, dtheta as lambdas
         for node in self.nodes:
             x, y = node.X[0], node.Y[0]
@@ -105,30 +125,30 @@ class Swarm:
             #dr = (100 - r)/100
             #dr = np.cos(r*np.pi/2)
             # causes several local optimum "lanes" around r=100
-            dr = (100 - r)/100 + np.cos(r*np.pi/3)
+            dr = (100 - r)/100 + (3/2)*np.cos(r*np.pi/3)
             dtheta = (20000 / r**2) * dt
 
             # test
             #print(r, theta, dr, dtheta)
 
             # apply dr, dtheta to r, theta
-            r += dr
+            r += dr + noise()
             theta += dtheta
 
             # and now update each node
             x, y = polar_to_xy(r, theta)
-            x += noise()
-            y += noise()
+            #x += noise()
+            #y += noise()
             node.update(x, y, dt)
 
-    def draw(self, screen = None, tail: bool = True):
+    def draw(self, screen = None, tail: bool = True, transform = lambda x: x):
         if screen is None:
             screen = self.screen
         
         # draw tails before nodes
         if tail:
             for node in self.nodes:
-                node.draw_tail(screen)
+                node.draw_tail(screen, transform)
             
         for node in self.nodes:
-            node.draw(screen)
+            node.draw(screen, transform)

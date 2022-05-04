@@ -161,6 +161,29 @@ def spectrum(
     '''
     Given x in (n), y in (n), bool m in (n,k),
     compute matrix d(n,n)
+
+    TODO: Come back tomorrow!
+
+>>> for k in range(4):
+...   for i in range(3):
+...     if ((I[i,:,k] / Ir[i,k]) >= 0.5).any():
+...       print(i,k, (I[i,:,k] / Ir[i,k]))
+i k 
+0 0 [0. 1. 0.]
+1 0 [1. 0. 0.]
+2 0 [0.47213595 0.52786405 0.        ]
+0 2 [0. 0. 1.]
+1 2 [0. 0. 1.]
+
+    Here, 0 and 1 hear eachother on k=0,
+    2 hears only 1 on k=0,
+    and 0 and 1 both hear node 2 on k=2.
+
+    From here:
+        - Meaningful metrics? (Throughput? Etc)
+        - Implement this
+        - Make nodes send messages
+
     '''
 
     # 1. Take xs and ys, compute pairwise d[i, k] in (N,N)
@@ -175,3 +198,4 @@ def spectrum(
 
 
 # import numpy as np; d = np.array([[0,3,4],[3,0,5],[4,5,0]]); m = np.array([[1,0,0,0],[1,0,0,0],[0,0,1,0]]); dd = d**.5; I = np.einsum('ij,jk->ijk', dd, m); Ir = I.sum(axis=1)
+

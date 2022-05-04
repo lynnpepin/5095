@@ -152,3 +152,26 @@ class Swarm:
             
         for node in self.nodes:
             node.draw(screen, transform)
+
+def spectrum(
+    x,
+    y,
+    m
+):
+    '''
+    Given x in (n), y in (n), bool m in (n,k),
+    compute matrix d(n,n)
+    '''
+
+    # 1. Take xs and ys, compute pairwise d[i, k] in (N,N)
+    # 2. Take ms and construct m[i, k] in (N,K)
+    # 3. Create I = np.einsum('ij,jk->ijk', dd, m) in (N, N, K)
+    #    Ir= I_ijk.sum(axis=1)
+    # E.g. Node 2 sees from 0 on channel k I[2,0,0]
+    #    compare as I[2,0,0] / Ir[2,0] to get ratio
+
+    # record successes
+    # send destruction deets to i and j so they can respond
+
+
+# import numpy as np; d = np.array([[0,3,4],[3,0,5],[4,5,0]]); m = np.array([[1,0,0,0],[1,0,0,0],[0,0,1,0]]); dd = d**.5; I = np.einsum('ij,jk->ijk', dd, m); Ir = I.sum(axis=1)

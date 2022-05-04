@@ -55,8 +55,9 @@ As stated, the entity/component/scene system is applied with functional programm
 | $\Delta t$  | Simulation timestep
 | $d_{ij}$    | Distance between nodes $i$ and $j$ at a gigven timestep.
 | $m_{nk}$    | Indicator function if node $n$ communicates on channel $k$.
-| $I_{ijk}$   | Intensity between two nodes $i$ and $j$ on channel $k$.
+| $I_{ijk}$   | Absolute intensity received by $i$ of message from $j$ over $k$. 
 | | $= m_{jk}\sqrt{d}_{ij}$
+| $I'_{ijk}$ | Relative intensity received by $i$ of message from $j$ over $k$. 
 
 
 Timesteps $t$ are often omitted when notation is only used in calculations that have no dependencies between timesteps (such as distance $d_{ij}$).
@@ -133,9 +134,13 @@ So, the only contention that can happen is when two channels talk at the same ti
 
 We assume no significant signal attenuation the medium and no beamforming, so signals are only degraded per the square root law. Let $d_{ij}$ denote the distance between nodes $i$ and $j$, and $m_{jk}$ indicate if a node $j$ is broadcasting a message on node $k$. So, a given node $i$ will see the intensity $I_{ijk}$ from node $j$ as $\sqrt{d}_{ij}m_{jk}$. So, the relative intensity of a message from the perspective $i$ of node $j$ broadcasting on channel $k$ is given as 
 
-$$\frac{I_{ijk}}{\sum_{n=1}^N I_{njk}} = \frac{\sqrt{d_{ij}}m_{jk}}{ \sum_{n=1}^N \sqrt{d_{in}}m_{nk}}$$
+$$I'_{ijk} = \frac{I_{ijk}}{\sum_{n=1}^N I_{njk}} = \frac{\sqrt{d_{ij}}m_{jk}}{ \sum_{n=1}^N \sqrt{d_{in}}m_{nk}}$$
 
 This can be accelerated with matrix multiplications, representing matrices and messages as matrices and performing $\sqrt{\cdot}$ elementwise. 
+
+We assume a message is constructively received by node $i$ from $j$ over $k$ iff $I'_{ijk} \geq \frac{1}{2}$.
+
+
 
 
 

@@ -11,29 +11,11 @@
 
 # Basic functionality
 
-The goal of this project is to create the foundations for an advanced network simulator. This work makes many (intended!) ommissions and simplifications, using a modularity approach combining entity/component/scene composition and functional programming.
+The goal of this project is to create an advanced particle swam network simulator. This work makes many (intended!) ommissions and simplifications, using a modularity approach combining entity/component/scene composition and functional programming.
 
-This project simulates a discrete-time network wireless physical-level mesh network. The goal is to measure network throughput in the presence of congestion for different collision-avoidance mechanisms. The network consists of $N$ particles in a swarm communicating over $k$ wireless channels.
+This project simulates a discrete-time network wireless physical-level mesh network. The goal is to measure network throughput in the presence of congestion for different collision-avoidance mechanisms. The network consists of $N$ particlein a swarm communicating over $k$ wireless channels. This simulation is implemented primarily using Python3, numpy, and PyGame[^pygame], the latter of which is used for rendering the simulation.
 
-This simulation is implemented primarily using Python3, numpy, and PyGame[^pygame], the latter of which is used for rendering the simulation.
-
-[^pygame]: https://www.pygame.org/
-
-As stated, the entity/component/scene system is applied with functional programming to increase modularity:
-
-- The **Entity Component Scene** pattern:
- - Each `Node` is an entity representing a particle with components such as the game screen or messages.
- - A `Swarm` manages the movement of these Nodes, passing the same components as Node,  functional patterns.
- - The `Spectrum` simulates the passing of messages in a wireless spectrum.
- - Components include the virtual screen used for rendering, channels, and messages.
- - One whole simulation is one scene.
- - **Functional patterns** are used to make the code re-usable, allowing the logic of one entity to be modified without requiring large structural changes. For example,
-  - Rendering transformations are passed to entities as 
-
- - The Scene is the PyGame main loop, and while these can be modularly composed
- - The PyGame loop instantiates one Swarm, which has one Spectrum class and many Nodes.
- - The Node and the Spectrum interact 
- - The Swarm defines the physics controlling the nodes and handles the logic
+[^pygame]: PyGame main site: https://www.pygame.org/
 
 # Model description
 
@@ -41,9 +23,62 @@ As stated, the entity/component/scene system is applied with functional programm
 - How solved
 - Other existing models
 
+## Design Principles 
+
+The design of this system is unique. While obstensibly object-oriented, this simulation is modeled as an Entity-Component System[^ecs] and strives to maximize the use of functional[^functional] components and patterns. This makes this simulator code an excellent foundation for further experiments.
+
+Because functional patterns are used so extensively, this makes the code unit testable despite being OoP and ECS heavy. Tests are available in `tests.py`.
+
+[^ecs]: ECS is a common software pattern for game dev and simulation design. Wikipedia offers a succinct summary with good further reading: https://en.wikipedia.org/wiki/Entity_component_system
+
+[^functional]: Here, *functional* refers to the *functional programming paradigm.* Functional paradigms have a multitude of advantages for code readability, testibility, composability, and modularity. 
+
+
+### ECS-Functional Example
+
+For example, each particle *entity* moves according to a system of differential equations  $\left(\frac{dr}{\Delta t}, \frac{d\theta}{\Delta t}\right)$. These equations (and their parameters) are individual *entities*.
+
+A traditional object-oriented approach might have the particle defined as follows:
+
+```
+class Node:
+    ...
+    def update(self):
+        dr = (100 - self.r)/100
+        dtheta = (20000 / self.r ** 2)
+        self.r += dr
+        self.theta += dtheta
+```
+
+Here, changing the functionality of `Node.update(...)` would require subclassing. Instead, we consider `dr` and `dtheta` *as functional components*:
+
+```
+class Node:
+    ...
+    def update(
+        self,
+        dr = lambda r: (100 - self.r)/100
+        dtheta = lambda r: dtheta = (20000 / self.r ** 2)
+    ):
+        self.r += dr(self.dr)
+        self.theta += dtheta(self.dtheta)
+```
+
+Compare this example code to the implementation in `toolkit.py`. The functionality of `Node` can be updated without subclassing. This approach is used throughout the codebase.
+
+The primary value of this approach is that it reduces dependence between components. That is to say, `Node` can be changed without requiring large structural changes. This has permitted rapid unit-test driven development[^tdd] and very quick simulated changes.
+
+[^tdd]: Test-driven development counterintuitively requires tests to be written *before* code. In practice, this allows for rapid development, quick error detection, and well-structured code. It also lends itself well to this functional approach!
+
+## Architecture
+
+TODO, file tree, UML
+
+
+
 
 \newpage
-# Appendix A: Tables of notation
+# Appendix A: Tables of notation {#sec:appendix_notation}
 
 ## General simulation notation:
 
@@ -58,7 +93,7 @@ As stated, the entity/component/scene system is applied with functional programm
 
 We omit timestep $t$ in calculations which have no dependency between timesteps (which is most of them).
 
-## Notation used in networksimulation:
+## Notation used in network simulation:
 
 |||
 |-|-|
@@ -89,7 +124,7 @@ These matrices are not used in this paper, but are used in the implementation an
 
 
 \newpage
-# Appendix B: Particle movement patterns
+# Appendix B: Particle movement patterns {#sec:appendix_physical}
 
 > **TLDR:** The particles move in a circle with several "lanes". The particles are then perturbed by adding Gaussian noise, allowing them to "jump" to other lanes.
 
@@ -120,7 +155,7 @@ The motion of recently-initialized particles is visualized in Fig \ref{particles
 
 
 \newpage
-# Appendix C: Physical layer contention modeling
+# Appendix C: Physical layer contention modeling{#sec:appendix_network}
 
 > **TLDR:** We model signal intensity and contention on a channel according to the inverse-square law. Node $i$ succesfully receives a message from node $j$ on channel $k$ if and only if that message accounts for at least $50\%$ of the amplitude. (Put simply, only if that message is the "loudest".)
 

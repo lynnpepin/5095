@@ -112,8 +112,13 @@ class Swarm:
             new_node = Node(x=x, y=y, hist_length=hist_length)
             self.nodes.append(new_node)
 
-    def update(self, dt = 1/60, noise = lambda: np.random.normal(0, 30)):
-        # todo: define dr, dtheta as lambdas
+    def update(self,
+        dt = 1/60,
+        noise = lambda: np.random.normal(0, 30),
+        drdt = lambda r: (100 - r)/100 + (3/2)*np.cos(r*np.pi/3),
+        dthetadt = lambda r: (20000 / r**2)
+        ):
+        # todo: redefine update on x, y as entirely functional
         for node in self.nodes:
             x, y = node.X[0], node.Y[0]
             # convert to polar
@@ -122,11 +127,8 @@ class Swarm:
             theta = math.atan2(y, x)
 
             # differential equations defining motion
-            #dr = (100 - r)/100
-            #dr = np.cos(r*np.pi/2)
-            # causes several local optimum "lanes" around r=100
-            dr = (100 - r)/100 + (3/2)*np.cos(r*np.pi/3)
-            dtheta = (20000 / r**2) * dt
+            dr = drdt(r) * dt
+            dtheta = dthetadt(r) * dt
 
             # test
             #print(r, theta, dr, dtheta)

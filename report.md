@@ -42,70 +42,73 @@ As stated, the entity/component/scene system is applied with functional programm
 - Other existing models
 
 
+\newpage
+# Appendix A: Tables of notation
 
-# Appendix A: Table of notation
+## General simulation notation:
 
 |||
 |-|-|
 | $(r, \theta)$ | Polar coordinates, (meters, radians)
-| (x, y)      | Cartesian coordinates, meters
+| (x, y)      | Cartesian coordinates (meters, meters)
 | $n \in N$   | Node index
 | $k \in K$   | Channel index
-| $t$         | Time in seconds
-| $\Delta t$  | Simulation timestep
-| $d_{ij}$    | Distance between nodes $i$ and $j$ at a gigven timestep.
-| $m_{nk}$    | Indicator function if node $n$ communicates on channel $k$.
-| $I_{ijk}$   | Absolute intensity received by $i$ of message from $j$ over $k$. 
-| | $= m_{jk}\sqrt{d}_{ij}$
-| $I'_{ijk}$ | Relative intensity received by $i$ of message from $j$ over $k$. 
+| $t$         | Time (seconds)
+| $\Delta t$  | Simulation timestep (seconds) 
+
+We omit timestep $t$ in calculations which have no dependency between timesteps (which is most of them).
+
+## Notation used in networksimulation:
+
+|||
+|-|-|
+| $d_{ij}$    | Distance between nodes $i$ and $j$. |
+| $m_{jk}$    | Indicator if node $j$ communicates on channel $k$. |
+| $a_{i,j,k}$ | Portion node $i$ perceives from $j$ on channel $k$.
+| | $= d^{-2}_{ij}m_{jk}$, with unit $\left(\frac{W}{m^2}\right)$ |
+| $a'_{i,k}$ | Total intensity node $i$ perceives on channel $k$.
+| | $= \sum_{j=1}^n d^{-2}_{ij}m_{jk}$ with unit $\left(\frac{W}{m^2}\right)$ |
+
+## Notation used in network simulation (matrices):
+
+These matrices are not used in this paper, but are used in the implementation and are worth describing.
+
+|||
+|-|-|
+| $D \in \mathbb{R}^{i, j}$ | Inverse-square distance matrix. |
+| | Let $D_{i,j} = d^{-2}_{i,j}$ |
+| $M \in \{0,1\}^{i \times j}$ | Message indicator matrix. |
+| $A \in \mathbb{R}^{i, j, k}$ | Node-node-channel intensity tensor.
+| | $A_{ijk} = D_{ij}M_{jk}$ as Einstein-Summation.[^einsum]
+| | Equivalently `np.einsum('ij,jk->ijk', D, M)`
+| $A'  \in \mathbb{R}^{i, k}$  | Node-channel intensity matrix.
+| | $= D_{ij}\times M_{jk}$.
+
+[^einsum]: Einstein-Summation notation is described succinctly here: https://rockt.github.io/2018/04/30/einsum
 
 
-Timesteps $t$ are often omitted when notation is only used in calculations that have no dependencies between timesteps (such as distance $d_{ij}$).
 
-
-<!-- The goal of this system is to simulate the physical layer of a wireless mesh network in order to measure its raw throughput. The network is composed of $N$ nodes, operating as a swarm
-
-This system simulates the motion of $N$ massless particles, communicating over a wireless system with $K$ channels -->
-
-<!-- # Appendix A: Signals and bits
-
-We want to simulate a raw wireless physical layer and measure the throughput in bits. This means no error-correction. We use a simplified formula for loss:[^pathloss]
-
-$$L = 20 \log_{10}\left(4\pi d \lambda^{-1}\right)$$
-
-where $d$ is in meters and $\lambda = 6\cdot10^{9}\text{Hz} = 6\text{GHz}$.
-
-[^pathloss]: Path loss details are succinctly explained at https://en.wikipedia.org/wiki/Path_loss
-
-Signal attenuation is roughly modeled by $I = e^{-a\cdot d}$, where $I$ is the signal intensity ratio, $a$ is a coefficient, and $d$ is distance (in meters for our purpose). We use this intenisty, $I$ (which ranges from 1 to 0) as the probability a single bit is lost to noise.
-
-There are *very very many* constants one needs to derive or source, many of which are not open knowledge as 6GHz WiFi is very new. Relevant constants include 6GHz background noise levels and attenuation rate through different mediums. 
-
- We assume an attenuation of roughly 50 dB per meter (https://www.extremenetworks.com/extreme-networks-blog/how-far-will-wi-fi-6e-travel-in-6-ghz/, https://www.nctatechnicalpapers.com/Paper/2019/2019-the-promise-of-wifi-in-the-6-ghz-band/download). This means --->
-
-
-
-
+\newpage
 # Appendix B: Particle movement patterns
 
-> **TLDR:** The particles move in a spiral with several local optimum per radius. The particles are then perturbed by adding Gaussian noise, allowing them to "jump" to other local optimum.
+> **TLDR:** The particles move in a circle with several "lanes". The particles are then perturbed by adding Gaussian noise, allowing them to "jump" to other lanes.
 
 ![Particles in normal movement conditions.\label{particles_normal}](a_particles_normal.png "Particles in normal movement conditions."){ width=200px }
 
 
-The $N$ particles are initialized at random at radius $\mathcal{N}(\mu=200,\sigma=30)$ and angle uniform $\mathcal{U}(2\pi)$ from center. The particles do not collide with one another and obey basic Newtonian physics.
+The $N$ particles are initialized at random at radius $\mathcal{N}(\mu=200,\sigma=30)$ and angle uniform $\mathcal{U}(2\pi)$ from center. The particles do not collide with one.
 
-First, the particles move according to a system of differential equations, where $(r, \theta)$ are polar coordinates (with the usual transform to Cartesian $(x, y)$ coordiates in $\mathbb{R}^2$):
+Primarily, the particles move according to a system of differential equations, where $(r, \theta)$ are polar coordinates (with the usual transform to Cartesian $(x, y)$ coordiates in $\mathbb{R}^2$):
 
-$$\frac{d\theta}{dt} = \frac{a_1}{r^2}$$
+$$\frac{d\theta}{\Delta t} = \frac{a_1}{r^2}$$
 
-$$\frac{dr}{dt} = \frac{R-r}{R} + a_2 \text{cos}\left(a_3r\right)$$
+$$\frac{dr}{\Delta t} = \frac{R-r}{R} + a_2 \text{cos}\left(a_3r\right)$$
 
 Here, $R, a_1, a_2, a_3$ are constants. This series of equations defines a system in which particles rotate at radius $R$ around center $(0, 0)$, with rotational speed proportional to $\frac{\pi}{r^2}$. The term $\frac{R-r}{R}$ yields local optimum around $r = R$, but the term $a_2\cdot \text{cos}\left(a_3\cdot r\right)$ adds local optimum "lanes" around $R$. In this manner, we get an interesting spread of particles.
 
 We set $R=100$ is the radius around which the particles rotate, $a_1 = 20000$ to control the rate of rotation. The combination of $a_2 = \frac{3}{2}$ and $a_3 = \frac{pi}{3}$ yield a nice spread of locally-minimum "lanes" around which particles can fall into.
 
-The radius is then perturbed by $\mathcal{N}\left(0, \frac{1}{2}\right)$. This added noise allows particles to 'jump' lanes.
+The radius is then perturbed by $\mathcal{N}\left(0, 30\right)\Delta t$ at each timestep. This added noise causes particles to occasionally 'jump' between the local-optimum 'lanes'.
 
 
 ![Early stages of particle movement.\label{particles_init}](a_particles_init.png "Early stages of particle movement."){ width=200px }
@@ -113,32 +116,31 @@ The radius is then perturbed by $\mathcal{N}\left(0, \frac{1}{2}\right)$. This a
 ![Particles in normal movement conditions without noise added\label{particles_nonoise}](a_particles_nonoise.png "Particles in normal movement conditions without noise added"){ width=200px }
 
 
-The motion of recently-initialized particles is shown in Fig \ref{particles_init}, where distant particles quickly move toward the $r=R$ center, moving as shown in Fig \ref{particles_normal}. Note the trails showing how particles 'jump' to different optimum due to added noise.
-
-Particle trails without noise are seen in Fig \ref{particles_nonoise}. Note the smoother motion and the lack of 'jumps'.
+The motion of recently-initialized particles is visualized in Fig \ref{particles_init}, where distant particles quickly move toward the $r=R$ center, moving as visualized in Fig \ref{particles_normal}. Note the trails showing how particles 'jump' to different optimum due to added noise. Particle trails without noise are seen in Fig \ref{particles_nonoise}. Note the smoother motion and the lack of 'jumps'.
 
 
+\newpage
 # Appendix C: Physical layer contention modeling
 
-We want to simulate a raw wireless physical layer and measure the throughput in bits. This means no error-correction or other signalimprovements. The biggest difficulty here is contention, that is, destructive interference when multiple nodes are talking over the same channel.
+> **TLDR:** We model signal intensity and contention on a channel according to the inverse-square law. Node $i$ succesfully receives a message from node $j$ on channel $k$ if and only if that message accounts for at least $50\%$ of the amplitude. (Put simply, only if that message is the "loudest".)
 
-We make significant assumptions here, primarily that: 
+We want to simulate a raw wireless physical layer and measure the throughput in bits. This means no error-correction or other protocol-level improvements. The biggest difficulty here is contention (destructive interference when multiple nodes are talking over the same channel.)
 
-1. there is no cross-talk between channels,
-2. there is no background interference and no scattering / absorption from objects the environment,
-3. and messages start, finish, and are received in only one timestep,
-4. Messages all contain different content and are of the same length,
-5. Destruction is identified in the same timestep as a message is received.
+We make significant assumptions here, primarily that:
 
-So, the only contention that can happen is when two channels talk at the same time. That is, for a receiver receiving signals simueltaneously from $J$ nodes $n_1, n_2, ..., n_j$, with distances $d_1, d_2, ..., d_J$, which will be the dominant message?
+1. The messages have no signal attenuation, background interference, scattering, absorption, or cross-talk.
+2. Messages are fixed-length, and are sent and received within one timestep.
+2. Destruction is identified instantly.
+4. All messages are sent with a fixed power.
+5. Nodes account for interference caused by their own messages.
+   - This means two nodes $i$ and $j$ can talk over channel $k$ without interference to one another.
 
-We assume no significant signal attenuation the medium and no beamforming, so signals are only degraded per the square root law. Let $d_{ij}$ denote the distance between nodes $i$ and $j$, and $m_{jk}$ indicate if a node $j$ is broadcasting a message on node $k$. So, a given node $i$ will see the intensity $I_{ijk}$ from node $j$ as $\sqrt{d}_{ij}m_{jk}$. So, the relative intensity of a message from the perspective $i$ of node $j$ broadcasting on channel $k$ is given as 
+This allows us to model contention only according to signal strength governed by the inverse-square law, that is, we assume $\text{Intensity} = \frac{\text{constant}}{\text{distance}^2}$. The constant does not matter, since it disappears in all calculations below.
 
-$$I'_{ijk} = \frac{I_{ijk}}{\sum_{n=1}^N I_{njk}} = \frac{\sqrt{d_{ij}}m_{jk}}{ \sum_{n=1}^N \sqrt{d_{in}}m_{nk}}$$
+Let $d_{ij}$ denote the distance between nodes $i$ and $j$, and $m_{jk}$ indicate if a node $j$ is broadcasting a message on node $k$. The intensity node $i$ perceives of a signal from node $j$ on a given channel $k$ is given as $$a_{i,j,k} = d^{-2}_{ij}m_{jk},$$ while the total intensity node $i$ perceives over channel $k$ is given as $$a'_{ik} = \sum_{j=1}^n d^{-2}_{ij}m_{jk}.$$ We assume node $i$ succesfully receives message $j$ over channel $k$ if $\frac{a_{ijk}}{a'_{ik}} \geq \frac{1}{2}$. 
 
-This can be accelerated with matrix multiplications, representing matrices and messages as matrices and performing $\sqrt{\cdot}$ elementwise. 
 
-We assume a message is constructively received by node $i$ from $j$ over $k$ iff $I'_{ijk} \geq \frac{1}{2}$.
+We assume a message is received by node $i$ from $j$ over $k$ iff $I'_{ijk} \geq \frac{1}{2}$.
 
 
 

@@ -112,7 +112,7 @@ class Swarm:
             new_node = Node(x=x, y=y, hist_length=hist_length)
             self.nodes.append(new_node)
 
-    def update(self, dt = 1/60, noise = lambda: np.random.normal(0, .5)):
+    def update(self, dt = 1/60, noise = lambda: np.random.normal(0, 30)):
         # todo: define dr, dtheta as lambdas
         for node in self.nodes:
             x, y = node.X[0], node.Y[0]
@@ -132,7 +132,7 @@ class Swarm:
             #print(r, theta, dr, dtheta)
 
             # apply dr, dtheta to r, theta
-            r += dr + noise()
+            r += dr + noise() * dt
             theta += dtheta
 
             # and now update each node

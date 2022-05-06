@@ -172,24 +172,8 @@ We make significant assumptions here, primarily that:
 
 This allows us to model contention only according to signal strength governed by the inverse-square law, that is, we assume $\text{Intensity} = \frac{\text{constant}}{\text{distance}^2}$. The constant does not matter, since it disappears in all calculations below.
 
+## Network details
+
 Let $d_{ij}$ denote the distance between nodes $i$ and $j$, and $m_{jk}$ indicate if a node $j$ is broadcasting a message on node $k$. The intensity node $i$ perceives of a signal from node $j$ on a given channel $k$ is given as $$a_{i,j,k} = d^{-2}_{ij}m_{jk},$$ while the total intensity node $i$ perceives over channel $k$ is given as $$a'_{ik} = \sum_{j=1}^n d^{-2}_{ij}m_{jk}.$$ We assume node $i$ succesfully receives message $j$ over channel $k$ if $\frac{a_{ijk}}{a'_{ik}} \geq \frac{1}{2}$. 
 
-
-We assume a message is received by node $i$ from $j$ over $k$ iff $I'_{ijk} \geq \frac{1}{2}$.
-
-
-
-
-
-<!-- So, a given signal from node $j$ will have intensity $d_i^{-2}$ in the perspective of the receiver. So, for a given node $j' \in \{1, J\}$, its relative power from a receivers point of view, compared to each other node, is denoted as $$\frac{d_{j'}^{-2}}{d_{j'}^{-2} - \sum_{i=1}^J {d_j'^{-2}}} = 1 - \left(\sum_{i=1}^J {d_j^{-2}}\right)^{-1}$$ -->
-
-
-
-
-
-<!-- Signal loss can be modeled as $e^{ad}$, where $a$ is some constant and $d$ is the distance. We let the ratio between signal-levels be the measurement of strength. We can assume only destructive (since constructive interference would be very unlikely for any significantly long message.)
-
-So, for a given node $j' \in \{1, J\}$, its relative power from a receivers point of view, compared to each other node, is denoted as $$\frac{e^{ad_{J'}}}{e^{ad_{J'} = \sum_{i=1}^Je^{d_{i}}}.$$
-
-Here, $a$ controls attenuation. For very small $a$, attenuation will be nearly linear with distance --->
-
+We model the physical layer medium only. This means we do not model interface-level systems (such as buffers) and we assume all messages are broadcast to all nodes (so, a message can be received by $N-1$ nodes). As per the notation table in Appendex A, the implementation deals with matrices $A'$, $D$, $M$, and with tensor $A.$

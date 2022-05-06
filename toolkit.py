@@ -112,7 +112,8 @@ class Swarm:
             new_node = Node(x=x, y=y, hist_length=hist_length)
             self.nodes.append(new_node)
 
-    def update(self,
+    def update(
+        self,
         dt = 1/60,
         noise = lambda: np.random.normal(0, 30),
         drdt = lambda r: (100 - r)/100 + (3/2)*np.cos(r*np.pi/3),
@@ -122,25 +123,15 @@ class Swarm:
         for node in self.nodes:
             x, y = node.X[0], node.Y[0]
             # convert to polar
-            # (todo -- should this be taken from node directly?)
             r = (x**2 + y**2)**.5
             theta = math.atan2(y, x)
 
             # differential equations defining motion
-            dr = drdt(r) * dt
-            dtheta = dthetadt(r) * dt
-
-            # test
-            #print(r, theta, dr, dtheta)
-
-            # apply dr, dtheta to r, theta
-            r += dr + noise() * dt
-            theta += dtheta
+            r += (drdt(r) + noise()) * dt
+            theta += dthetadt(r) * dt
 
             # and now update each node
             x, y = polar_to_xy(r, theta)
-            #x += noise()
-            #y += noise()
             node.update(x, y, dt)
 
     def draw(self, screen = None, tail: bool = True, transform = lambda x: x):
@@ -154,6 +145,14 @@ class Swarm:
             
         for node in self.nodes:
             node.draw(screen, transform)
+
+
+def simulate_physical(
+    dt = 1/60,
+    K = 10
+):
+    # TODO
+
 
 def spectrum(
     x,

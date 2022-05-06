@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import numpy as np
 
 def interpolate_color(c1, c2, r):
+    r = max(0, min(1, r))
     return np.array(c1) * (1-r) + np.array(c2) * r
 
 # from https://lospec.com/palette-list/sweetie-16
@@ -30,22 +31,22 @@ class S16:
     Informal names for the 16 colors
     in GrafxKid's SWEETIE16 palette.
     '''
-    black  = np.array((26,  28,  44))
-    purple = np.array((93,  39,  93))
-    red    = np.array((177, 62,  83))
-    orange = np.array((239, 125, 87))
-    yellow = np.array((255, 205, 117))
-    lime   = np.array((167, 240, 112))
-    green  = np.array((56,  183, 100))
-    teal   = np.array((37,  113, 121))
-    navy   = np.array((41,  54,  111))
-    blue   = np.array((59,  93,  201))
-    cerulean = np.array((65,  166, 246))
-    cyan = np.array((115, 239, 247))
-    livid_darkest = np.array((51,  60,  87))
-    livid_dark    = np.array((86,  108, 134))
-    livid_light   = np.array((148, 176, 194))
-    white  = np.array((244, 244, 244))
+    black  = np.array((26,  28,  44, 255))
+    purple = np.array((93,  39,  93, 255))
+    red    = np.array((177, 62,  83, 255))
+    orange = np.array((239, 125, 87, 255))
+    yellow = np.array((255, 205, 117, 255))
+    lime   = np.array((167, 240, 112, 255))
+    green  = np.array((56,  183, 100, 255))
+    teal   = np.array((37,  113, 121, 255))
+    navy   = np.array((41,  54,  111, 255))
+    blue   = np.array((59,  93,  201, 255))
+    cerulean = np.array((65,  166, 246, 255))
+    cyan = np.array((115, 239, 247, 255))
+    livid_darkest = np.array((51,  60,  87, 255))
+    livid_dark    = np.array((86,  108, 134, 255))
+    livid_light   = np.array((148, 176, 194, 255))
+    white  = np.array((244, 244, 244, 255))
 
     # livid is a grey-blue
     # black and white

@@ -14,7 +14,7 @@ import numpy as np
 import pygame
 from pygame import freetype
 
-from toolkit import Node, Swarm, example_physical_simulation, polar_to_xy, center_origin, draw_M
+from toolkit import Node, Swarm, example_physical_simulation, polar_to_xy, center_origin, draw_M, _normalize_safe
 from palette import S16, interpolate_color
 
 
@@ -41,6 +41,7 @@ def main(
     #### Start simulation
     swarm = Swarm(N=N, screen=screen, hist_length=60)
     M_to_draw = np.zeros((N,K))
+    Ar_to_draw = np.zeros((N,K))
 
     while True:
         screen.fill(S16.black)
@@ -62,13 +63,36 @@ def main(
         for ii in range(N):
             coordinates[ii] = (swarm.nodes[ii].X[0], swarm.nodes[ii].Y[0])
         
-        tot_sent, tot_recv, M, _, _ = example_physical_simulation(coordinates, dt, K)
+        tot_sent, tot_recv, M, D, _, Ar = example_physical_simulation(coordinates, dt, K)
 
         #### Draw metadata
-        # Draw M graph
-        M_to_draw = np.clip(M + 0.9 * M_to_draw, 0, 1)
-        draw_M(corner=(12, 24), M=M_to_draw, screen=screen)
+        # Draw M and Ar here
+        fps_text = font.render('M and A\' visualization', S16.lime)
+        screen.blit(fps_text[0], (4,4))
 
+        # Draw M graph
+        M_to_draw = np.clip(M + 0.8 * M_to_draw, 0, 1)
+        draw_M(corner=(4, 16), M=M_to_draw.T, screen=screen, width=3)
+
+        # Draw Ar graph
+        Ar_to_draw = np.clip(
+            _normalize_safe(Ar) + 0.8 * Ar_to_draw,
+            0, 1
+        )
+        draw_M(corner=(13 + K*4, 16), M=Ar_to_draw.T, screen=screen, width=3)
+
+        # Draw D graph text
+        D_corner=(width - N*3 - 4, height-N*3 - 4)
+        fps_text = font.render('D visualization', S16.orange)
+        screen.blit(fps_text[0], (D_corner[0], D_corner[1] - 16))
+
+        # Draw D graph
+        D = _normalize_safe(D)**(1/4)
+        draw_M(
+            corner=D_corner,
+            M=D, screen=screen, width=3, border=0, C1=S16.orange
+        )
+        
         # Draw FPS
         #fps_text = font.render('abc', S16.white)
         #screen.blit(fps_text[0], (4,4))

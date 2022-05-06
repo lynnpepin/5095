@@ -206,7 +206,7 @@ def example_physical_simulation(
           if Ar[ii, kk] != 0 and A[ii,jj,kk] / Ar[ii, kk] > 1/2:
             total_message_received += 1
     
-    return total_messages_sent, total_message_received, M, A, Ar
+    return total_messages_sent, total_message_received, M, D, A, Ar
 
 
 def draw_M(
@@ -215,7 +215,8 @@ def draw_M(
     corner = (0.0,0.0),
     width = 3.0,
     border = 1.0,
-    alpha = 0.9
+    C1 = S16.lime,
+    C2 = S16.black
 ):
     """Draw a summary of the messages being sent by M.
 
@@ -231,12 +232,16 @@ def draw_M(
     :type border: int, optional
     :param alpha: Degradation of the previous-M rendering, defaults to 0.9
     :type alpha: float, optional
+    :param C1: Main color, defaults to S16.lime
+    :type C1: np.ndarray or Tuple
+    :param C2: Background color, defaults to S16.black
+    :type C2: np.ndarray or Tuple
     """
 
     N, K = M.shape
     for ii in range(N):
         for kk in range(K):
-            color = interpolate_color(S16.lime, S16.black, 1 - M[ii,kk])
+            color = interpolate_color(C1, C2, 1 - M[ii,kk])
             #rect = pygame.Rect(
             #    left   = corner[0] + (width+border)*ii,
             #    top    = corner[1] + (width+border)*kk,
@@ -254,3 +259,11 @@ def draw_M(
                     width
                 )
             )
+
+def _normalize_safe(A):
+    maxval = A.max()
+    minval = A.min()
+    if (maxval - minval) < 0.001:
+        return A
+    else:
+        return (A - minval)/(maxval - minval)

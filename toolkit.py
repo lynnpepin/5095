@@ -2,6 +2,7 @@ import math
 import numpy as np
 import pygame
 from palette import interpolate_color, S16
+from typing import List, Tuple
 
 def polar_to_xy(r: float, theta: float = 0):
     """Convert polar coordinates in (r, theta) to cartesian (x, y).
@@ -147,56 +148,64 @@ class Swarm:
             node.draw(screen, transform)
 
 
-def simulate_physical(
-    dt = 1/60,
-    K = 10
+def example_physical_simulation(
+    coordinates: List[Tuple[float, float]],
+    dt: float = 1/60,
+    K: int = 10
 ):
-    # TODO
+    """Example physical-layer simulator as per the paper.
 
+    Our assumptions and simplifications let us simulate
+    the entire network in just one function, given only
+    the x,y coordinates and metadata!
 
-def spectrum(
-    x,
-    y,
-    m
-):
-    '''
-    Given x in (n), y in (n), bool m in (n,k),
-    compute matrix d(n,n)
+    :param coordinates: List of x, y coordinates
+    :type coordinates: List[Tuple[float, float], ...]
+    :param dt: Timestep, defaults to 1/60
+    :type dt: float, optional
+    :param K: Number of channels, defaults to 10
+    :type K: int, optional
 
-    TODO: Come back tomorrow!
+    :returns: Total messages sent, total messages received,
+        plus matrices M, A, and Ar (for experimentation).
+    """
+    # N = number of nodes
+    N = len(coordinates)
 
->>> for k in range(4):
-...   for i in range(3):
-...     if ((I[i,:,k] / Ir[i,k]) >= 0.5).any():
-...       print(i,k, (I[i,:,k] / Ir[i,k]))
-i k 
-0 0 [0. 1. 0.]
-1 0 [1. 0. 0.]
-2 0 [0.47213595 0.52786405 0.        ]
-0 2 [0. 0. 1.]
-1 2 [0. 0. 1.]
+    # 1. create D
+    D = np.zeros((N, N))
+    for ii in range(N):
+        xi, yi = coordinates[ii]
+        for jj in range(N):
+            xj, yj = coordinates[jj]
+            # distance^-2 = (Dx^2 + Dy^2)^.5^-2
+            if ii == jj:
+                D[ii,ii] = 0
+            else:
+                D[ii,jj] = ((xi - xj)**2 + (yi - yj)**2)**-1
+        
+        # zero out the diagonal
+        
 
-    Here, 0 and 1 hear eachother on k=0,
-    2 hears only 1 on k=0,
-    and 0 and 1 both hear node 2 on k=2.
+    # 2. Generate message matrix M according to paper
+    # That is, each node creates a message on channel k with probability dt
+    M = (np.random.random((N, K)) < dt).astype(int)
+    
+    # 3. Calculate A' and A
+    Ar = D @ M 
+    A = np.einsum('ij,jk->ijk',D,M) # Loudness per node-pair per message
 
-    From here:
-        - Meaningful metrics? (Throughput? Etc)
-        - Implement this
-        - Make nodes send messages
+    # 4. Calculate metrics
+    total_messages_sent = np.sum(M)
+    total_message_received = 0
+    
+    # this can probably be vectorized
+    for ii in range(N):
+      for jj in range(N):
+        for kk in range(K):
+          if Ar[ii, kk] != 0 and A[ii,jj,kk] / Ar[ii, kk] > 1/2:
+            total_message_received += 1
+    
+    return total_messages_sent, total_message_received, M, A, Ar
 
-    '''
-
-    # 1. Take xs and ys, compute pairwise d[i, k] in (N,N)
-    # 2. Take ms and construct m[i, k] in (N,K)
-    # 3. Create I = np.einsum('ij,jk->ijk', dd, m) in (N, N, K)
-    #    Ir= I_ijk.sum(axis=1)
-    # E.g. Node 2 sees from 0 on channel k I[2,0,0]
-    #    compare as I[2,0,0] / Ir[2,0] to get ratio
-
-    # record successes
-    # send destruction deets to i and j so they can respond
-
-
-# import numpy as np; d = np.array([[0,3,4],[3,0,5],[4,5,0]]); m = np.array([[1,0,0,0],[1,0,0,0],[0,0,1,0]]); dd = d**.5; I = np.einsum('ij,jk->ijk', dd, m); Ir = I.sum(axis=1)
 

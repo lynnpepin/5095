@@ -177,3 +177,6 @@ This allows us to model contention only according to signal strength governed by
 Let $d_{ij}$ denote the distance between nodes $i$ and $j$, and $m_{jk}$ indicate if a node $j$ is broadcasting a message on node $k$. The intensity node $i$ perceives of a signal from node $j$ on a given channel $k$ is given as $$a_{i,j,k} = d^{-2}_{ij}m_{jk},$$ while the total intensity node $i$ perceives over channel $k$ is given as $$a'_{ik} = \sum_{j=1}^n d^{-2}_{ij}m_{jk}.$$ We assume node $i$ succesfully receives message $j$ over channel $k$ if $\frac{a_{ijk}}{a'_{ik}} \geq \frac{1}{2}$. 
 
 We model the physical layer medium only. This means we do not model interface-level systems (such as buffers) and we assume all messages are broadcast to all nodes (so, a message can be received by $N-1$ nodes). As per the notation table in Appendex A, the implementation deals with matrices $A'$, $D$, $M$, and with tensor $A.$
+
+At each timestep $t$, each node $i$ generates a message on channel $k$ with probability $\Delta t$. This corresponds roughly to a Poisson process with $\lambda = 1$. The functionality of the network simulation is vectorized for efficiency, with the logic taking place in the main loop rather than per-node.
+

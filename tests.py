@@ -1,7 +1,7 @@
 import unittest as ut
 import numpy as np
 
-from toolkit import Node, Swarm, polar_to_xy, center_origin
+from toolkit import Node, Swarm, example_physical_simulation, polar_to_xy, center_origin
 
 from palette import S16, s16_raw, interpolate_color
 
@@ -101,6 +101,17 @@ class UtilTests(ut.TestCase):
             center_origin((-1,-1),400,400),
             (199, 199)
         )
+    
+    def test_sanity_physical(self):
+        for _ in range(6):
+            K = np.random.randint(1,20)
+            tot_sent, tot_rec, _, _, _ = example_physical_simulation(
+                coordinates = np.random.random(
+                    size=(np.random.randint(2,60), 2)
+                ),
+                dt = np.random.random(),
+                K = K
+            )
 
 
 class PaletteTests(ut.TestCase):

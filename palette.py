@@ -2,6 +2,17 @@ from dataclasses import dataclass
 import numpy as np
 
 def interpolate_color(c1, c2, r):
+    """Interpolate between two arrays. Clamps r to [0,1]
+
+    :param c1: Minimum value (when r=0)
+    :type c1: np.ndarray
+    :param c2: _description_
+    :type c2: Minimum value (when r=1)
+    :param r: _description_
+    :type r: Coefficient of interpolation.
+    :return: Interpolation between c1 and c2.
+    :rtype: np.ndarray
+    """
     r = max(0, min(1, r))
     return np.array(c1) * (1-r) + np.array(c2) * r
 

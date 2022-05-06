@@ -36,20 +36,42 @@ def center_origin(coord, width=360, height=360):
     return (coord[0] + width/2, coord[1] + width/2)
 
 class Node:
+
     def __init__(
         self,
         x = 0,
         y = 0,
         hist_length = 20,
         screen = None,
-    ):      
+    ):
+        """
+        A single particle that moves in the system
+
+        :param x: Initial x-coordinate, defaults to 0
+        :type x: int, optional
+        :param y: Initial y-coordinate, defaults to 0
+        :type y: int, optional
+        :param hist_length: Position history, used for drawing tail, defaults to 20
+        :type hist_length: int, optional
+        :param screen: Display to draw to, defaults to None
+        :type screen: pygame.Surface, optional
+        """
         # X[0] = current position
         self.hist_length = hist_length
         self.X = [x for _ in range(hist_length)]
         self.Y = [y for _ in range(hist_length)]
         self.screen = screen
 
-    def update(self, x = 0, y = 0, dt = 1/60):
+    def update(self, x: int = 0, y: int = 0, dt = 1/60):
+        """Set a new x,y and update the history.
+
+        :param x: New x coordinate, defaults to 0
+        :type x: int, optional
+        :param y: New y coordinate, defaults to 0
+        :type y: int, optional
+        :param dt: Dt, unused, defaults to 1/60
+        :type dt: float, optional
+        """
         # remove the last element of each list
         self.X.pop()
         self.Y.pop()
@@ -58,6 +80,15 @@ class Node:
         self.Y.insert(0, y)
     
     def draw_tail(self, screen = None, transform = lambda x: x):
+        """Draw the tail following the node
+
+        :param screen: Pygame display, defaults to None
+        :type screen: pygame.Surface, optional
+        :param transform: Function to apply to (x,y) coordinate,
+            e.g. to reposition to center. Defaults to lambdax:x
+
+        :type transform: _type_, optional
+        """
         if screen is None:
             screen = self.screen
         
@@ -76,6 +107,15 @@ class Node:
             )
     
     def draw(self, screen = None, transform = lambda x: x):
+        """Draw the node as a circle
+
+        :param screen: Pygame display, defaults to None
+        :type screen: pygame.Surface, optional
+        :param transform: Function to apply to (x,y) coordinate,
+            e.g. to reposition to center. Defaults to lambdax:x
+
+        :type transform: _type_, optional
+        """
         if screen is None:
             screen = self.screen
         
@@ -97,6 +137,21 @@ class Swarm:
         hist_length = 40,
         screen = None
     ):
+        """A collection of N nodes.
+
+        :param N: Number of nodes, defaults to 20
+        :type N: int, optional
+        :param get_radius: Function to choose radius to initialize nodes on,
+            defaults to lambda:np.random.normal(200, 30)
+        :type get_radius: function, optional
+        :param get_theta: Function to choose angle to initialize nodes on,
+            defaults to lambda:np.random.uniform(0, 2*np.pi)
+        :type get_theta: _type_, optional
+        :param hist_length: Number of coordinates to store per node, defaults to 40
+        :type hist_length: int, optional
+        :param screen: Display to draw to, defaults to None
+        :type screen: pygame.Surface, optional
+        """
 
         self._get_radius = get_radius
         self._get_theta = get_theta
@@ -116,10 +171,21 @@ class Swarm:
     def update(
         self,
         dt = 1/60,
-        noise = lambda: np.random.normal(0, 30),
-        drdt = lambda r: (100 - r)/100 + (3/2)*np.cos(r*np.pi/3),
+        drdt = lambda r: (100 - r)/100 + (3/2)*np.cos(r*np.pi/3) + np.random.normal(0, 30),
         dthetadt = lambda r: (20000 / r**2)
-        ):
+    ):
+        """Update the positions of the nodes according to
+        dr and dtheta series of differential equations
+
+        drdt and dthetadt are functions
+
+        :param dt: Timestep, defaults to 1/60
+        :type dt: float, optional
+        :param drdt: Function that updates r; defaults per paper
+        :type drdt: Function, optional
+        :param dthetadt: Function that updates theta, defaults per paper
+        :type dthetadt: Function, optional
+        """
         # todo: redefine update on x, y as entirely functional
         for node in self.nodes:
             x, y = node.X[0], node.Y[0]
@@ -128,7 +194,7 @@ class Swarm:
             theta = math.atan2(y, x)
 
             # differential equations defining motion
-            r += (drdt(r) + noise()) * dt
+            r += drdt(r) * dt
             theta += dthetadt(r) * dt
 
             # and now update each node
@@ -136,6 +202,15 @@ class Swarm:
             node.update(x, y, dt)
 
     def draw(self, screen = None, tail: bool = True, transform = lambda x: x):
+        """Draw all the nodes in the swarm to the screen.
+
+        :param screen: PyGame surface, defaults to None
+        :type screen: pygame.Surface, optional
+        :param tail: Draw the node tails, defaults to True
+        :type tail: bool, optional
+        :param transform: Transform to apply to each pixel (x,y) coordinate, defaults to lambdax:x
+        :type transform: Function, optional
+        """
         if screen is None:
             screen = self.screen
         
@@ -143,7 +218,8 @@ class Swarm:
         if tail:
             for node in self.nodes:
                 node.draw_tail(screen, transform)
-            
+        
+        # draw nodes
         for node in self.nodes:
             node.draw(screen, transform)
 
@@ -261,6 +337,7 @@ def draw_M(
             )
 
 def _normalize_safe(A):
+    # quick helper function
     maxval = A.max()
     minval = A.min()
     if (maxval - minval) < 0.001:

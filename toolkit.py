@@ -66,7 +66,7 @@ class Node:
         # draw tail
         for ii in range(self.hist_length - 1):
             alpha = (ii + 1) / self.hist_length
-            color = interpolate_color(S16.white, S16.livid_darkest, alpha)
+            color = interpolate_color(S16.cyan, S16.livid_darkest, alpha)
             pygame.draw.line(
                 screen,
                 color,

@@ -209,3 +209,33 @@ def example_physical_simulation(
     return total_messages_sent, total_message_received, M, A, Ar
 
 
+def draw_M(
+    M,
+    screen,
+    corner = (0,0),
+    width = 3,
+    border = 1
+):
+    """Draw a summary of the messages being sent by M.
+
+    :param M: _description_
+    :type M: _type_
+    :param screen: _description_
+    :type screen: _type_
+    :param corner: _description_, defaults to (0,0)
+    :type corner: tuple, optional
+    """
+    N, K = M.shape
+    for ii in range(N):
+        for kk in range(K):
+            color = interpolate_color(S16.lime, S16.black, 1 - M[ii,kk])
+            rect = pygame.Rect(
+                left = corner[0] + (width+border)*ii,
+                top  = corner[1] + (width+border)*kk,
+                width = width,
+                height = height)
+            pygame.draw.rect(
+                screen,
+                color,
+                rect
+            )

@@ -105,7 +105,7 @@ class UtilTests(ut.TestCase):
     def test_sanity_physical(self):
         for _ in range(6):
             K = np.random.randint(1,20)
-            tot_sent, tot_rec, _, _, _ = example_physical_simulation(
+            tot_sent, tot_rec, _, _, _, _ = example_physical_simulation(
                 coordinates = np.random.random(
                     size=(np.random.randint(2,60), 2)
                 ),

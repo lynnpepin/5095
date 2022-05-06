@@ -1,6 +1,5 @@
 """
 """
-
 import argparse
 import math as mt
 import os
@@ -29,6 +28,33 @@ def main(
     simplify_render: bool = False,
     ratelimit: bool = True
 ):
+    """Run the network experiment on the particle swarm.
+
+    Generates N nodes talking over K channels,
+    displays to a window of (width, height),
+    with timestep defined by fps.
+
+    :param N: Number of nodes, defaults to 40
+    :type N: int, optional
+    :param K: Number of channels, defaults to 10
+    :type K: int, optional
+    :param width: Display width, defaults to 360
+    :type width: int, optional
+    :param height: Display height, defaults to 360
+    :type height: int, optional
+    :param fps: Frames per second, controls dt timestep, defaults to 60
+    :type fps: int, optional
+    :param total_time: Total time (in seconds) to simulate, defaults to 120
+    :type total_time: float, optional
+    :param font_fn: Font to use for rendering on screen, defaults to "BitPotion.ttf"
+    :type font_fn: str, optional
+    :param simplify_render: Turn off tails and graphs, defaults to False
+    :type simplify_render: bool, optional
+    :param ratelimit: Slow the simulation rendering if it runs faster than the display, defaults to True
+    :type ratelimit: bool, optional
+    :return: Returns 0 on exit
+    :rtype: int
+    """
     # See https://dr0id.bitbucket.io/legacy/pygame_tutorial00.html
     pygame.init()
     pygame.freetype.init()
@@ -108,6 +134,7 @@ def main(
             clock.tick(fps)
             
         pygame.display.update()
+    return 0
 
 
 

@@ -212,30 +212,45 @@ def example_physical_simulation(
 def draw_M(
     M,
     screen,
-    corner = (0,0),
-    width = 3,
-    border = 1
+    corner = (0.0,0.0),
+    width = 3.0,
+    border = 1.0,
+    alpha = 0.9
 ):
     """Draw a summary of the messages being sent by M.
 
-    :param M: _description_
-    :type M: _type_
-    :param screen: _description_
-    :type screen: _type_
-    :param corner: _description_, defaults to (0,0)
+    :param M: message matrix
+    :type M: np.ndarray
+    :param screen: PyGame screen
+    :type screen: pygame.Surface
+    :param corner: Top-left corner to draw, defaults to (0.0,0.0)
     :type corner: tuple, optional
+    :param width: Width of each block, defaults to 3.0
+    :type width: float, optional
+    :param border: Border between blocks, defaults to 1.0
+    :type border: int, optional
+    :param alpha: Degradation of the previous-M rendering, defaults to 0.9
+    :type alpha: float, optional
     """
+
     N, K = M.shape
     for ii in range(N):
         for kk in range(K):
             color = interpolate_color(S16.lime, S16.black, 1 - M[ii,kk])
-            rect = pygame.Rect(
-                left = corner[0] + (width+border)*ii,
-                top  = corner[1] + (width+border)*kk,
-                width = width,
-                height = height)
+            #rect = pygame.Rect(
+            #    left   = corner[0] + (width+border)*ii,
+            #    top    = corner[1] + (width+border)*kk,
+            #    width  = width,
+            #    height = width
+            #)
+
             pygame.draw.rect(
-                screen,
-                color,
-                rect
+                surface = screen,
+                color = color,
+                rect = (
+                    corner[0] + (width+border)*ii,
+                    corner[1] + (width+border)*kk,
+                    width,
+                    width
+                )
             )

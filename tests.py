@@ -41,6 +41,16 @@ class NodeTests(ut.TestCase):
             self.assertEqual(some_node.X[:length], xs[::-1])
             self.assertEqual(some_node.Y[:length], ys[::-1])
 
+    def test_update_doesnt_fail(self):
+        for _ in range(10):
+            nodes = [
+                Node(x=np.random.rand()*10-5,y=np.random.rand()*10-5,)
+                for _ in range(10)
+            ]
+            for _ in range(100):
+                for node in nodes:
+                    node.update()
+
 class SwarmTests(ut.TestCase):
     def test_swarm_lengths(self):
         for _ in range(100):
@@ -53,6 +63,14 @@ class SwarmTests(ut.TestCase):
             for node in swarm.nodes:
                 self.assertEqual(len(node.X), hist_length)
                 self.assertEqual(len(node.Y), hist_length)
+
+    def test_swarm_update_doesnt_fail(self):
+        for _ in range(6):
+            swarm = Swarm(N=np.random.randint(0,60))
+            for _ in range(60):
+                swarm.update(
+                    dt = np.random.random()
+                )
 
 class UtilTests(ut.TestCase):
     def test_polar_to_xy(self):

@@ -17,11 +17,22 @@ This project simulates a discrete-time network wireless physical-level mesh netw
 
 [^pygame]: PyGame main site: https://www.pygame.org/
 
+
+
 # Model description
 
-- Main challenges in system design
-- How solved
-- Other existing models
+![(1) A single networked node. (2) All the nodes together form the Swarm. (3) Visualization of the $M$ matrix, showing which nodes and channels are active in the given timestep. (4) A diagram showing the $A'$ node-channel intensity matrix. (5) A diagram showing the $D$ inverse-square distance matrix.\label{screenshot}](screenshot.png "Screenshot"){ width=240px }
+
+This simulator is composed of three primary parts. They are described in detail in Appendix A (Notation), Appendix B (Partical movement physics), and Appendix C (Physical layer network model).
+
+The simulator is visualized in Figure~\ref{screenshot}. In short, these $N$ particles rotate according to a noisy series of differential equations in polar coordinate. On these fixed paths, they communicate over $K$ wireless channels. Signals are greatly simplified such that their intensity only follows the inverse square law. This simplification allows us to perform a wireless network simulation far faster than traditional means, since wave dynamics are not considered. Simulating these network dynamics was the greatest difficulty.
+
+This simulator only measures the physical-layer level throughput, so no mechanisms such as collision-detection/collision-avoidance, exponential backoff, buffering, or ECC are used. Specifically, this simulator measures only **broadcast throughput**. That is, we measure
+
+$$\text{Throughput} = \frac{\text{Messages received}}{(N-1)\cdot\text{Messages sent}}$$
+
+Note the $N-1$ term: This is because one message can be received by all other $N-1$ nodes. 
+
 
 ## Design Principles 
 
@@ -33,7 +44,7 @@ Because functional patterns are used so extensively, this makes the code unit te
 
 [^functional]: Here, *functional* refers to the *functional programming paradigm.* Functional paradigms have a multitude of advantages for code readability, testibility, composability, and modularity. 
 
-
+\newpage
 ### ECS-Functional Example
 
 For example, each particle *entity* moves according to a system of differential equations  $\left(\frac{dr}{\Delta t}, \frac{d\theta}{\Delta t}\right)$. These equations (and their parameters) are individual *entities*.
@@ -72,8 +83,29 @@ The primary value of this approach is that it reduces dependence between compone
 
 ## Architecture
 
-TODO, file tree, UML
+The architecture of this code is surmised in `README.md` as follows:
 
+    ```
+    ├── assets
+    │   │ Contains the one font used in this game.
+    │   │
+    │   └── BitPotion.ttf
+    │
+    ├── main.py
+    │     Contains the `main()` loop and the argument parser.
+    │
+    ├── palette.py
+    │     Contains code for dealing with colors.
+    │     Specifically, GrafxKid's 'Sweetie16' colors palette.
+    │
+    ├── toolkit.py
+    │     Contain the main functionality. Includes Node and Swarm.
+    │ 
+    └─── tests.py
+           Contains unit tests and sanity checks.
+    ```
+
+An abbreviated UML diagram is as follows:
 
 
 

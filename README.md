@@ -33,8 +33,34 @@ This project uses Python 3.7+, `numpy`, `pygame`
     --noratelimit         Render faster than FPS
 ```
 
+## Architecture
+
+
+The code is structured as follows:
+
+    ```
+    ├── assets
+    │   │ Contains the one font used in this game.
+    │   │
+    │   └── BitPotion.ttf
+    │
+    ├── main.py
+    │     Contains the `main()` loop and the argument parser.
+    │
+    ├── palette.py
+    │     Contains code for dealing with colors.
+    │     Specifically, GrafxKid's 'Sweetie16' colors palette.
+    │
+    ├── toolkit.py
+    │     Contain the main functionality. Includes Node and Swarm.
+    │ 
+    └─── tests.py
+           Contains unit tests and sanity checks.
+    ```
+
+
 ## Attribution and License
 
-This project uses [the BitPotion font by Joeb Rogers](https://joebrogers.itch.io/bitpotion) ([CC-BY](https://creativecommons.org/licenses/by/4.0/)) and the [SWEETIE-16 palette by GrafxKid](https://lospec.com/palette-list/sweetie-16).
+This project uses [the BitPotion font by Joeb Rogers](https://joebrogers.itch.io/bitpotion) ([CC-BY](https://creativecommons.org/licenses/by/4.0/)) and the [SWEETIE-16 palette by GrafxKid](https://lospec.com/palette-list/sweetie-16). The UML diagrams in the report were made using templates from diagrams.net
 
 This code is copyright Lynn Pepin, 'lynndotpy'. It is unlicensed, which technically means you can't use it, but practically speaking, it's just because I haven't chosen one yet. Contact me if you want to use this for something commercial!

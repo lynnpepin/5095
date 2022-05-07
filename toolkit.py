@@ -98,6 +98,8 @@ class Node:
         for ii in range(self.hist_length - 1):
             alpha = (ii + 1) / self.hist_length
             color = interpolate_color(S16.cyan, S16.livid_darkest, alpha)
+            # Quick fix: The line made the nodes look a certain way.
+            # Let's change that here...
             '''
             pygame.draw.line(
                 screen,
@@ -111,8 +113,9 @@ class Node:
                 screen,
                 color,
                 transform((self.X[ii], self.Y[ii])),
-                radius = 2 + (ii // 6)
+                radius = 2 + (ii // 6) # cheap quick hack; dependent on dt!
             )
+
     
     def draw(self, screen = None, transform = lambda x: x):
         """Draw the node as a circle

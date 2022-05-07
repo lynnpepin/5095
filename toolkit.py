@@ -98,12 +98,20 @@ class Node:
         for ii in range(self.hist_length - 1):
             alpha = (ii + 1) / self.hist_length
             color = interpolate_color(S16.cyan, S16.livid_darkest, alpha)
+            '''
             pygame.draw.line(
                 screen,
                 color,
                 transform((self.X[ii], self.Y[ii])),
                 transform((self.X[ii + 1], self.Y[ii + 1])),
                 width = 2
+            )
+            '''
+            pygame.draw.circle(
+                screen,
+                color,
+                transform((self.X[ii], self.Y[ii])),
+                radius = 2 + (ii // 6)
             )
     
     def draw(self, screen = None, transform = lambda x: x):

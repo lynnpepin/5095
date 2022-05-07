@@ -15,7 +15,7 @@ environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import pygame
 from pygame import freetype
 
-from toolkit import Node, Swarm, example_physical_simulation, polar_to_xy, center_origin, draw_M, _normalize_safe
+from toolkit import Node, Swarm, example_physical_simulation, center_origin, draw_M, _normalize_safe
 from palette import S16, interpolate_color
 
 

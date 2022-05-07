@@ -83,29 +83,36 @@ The primary value of this approach is that it reduces dependence between compone
 
 ## Architecture
 
+![A small version of the UML diagram. Please see `UML.pdf` for the full diagram.\label{uml_small}](UML_small.pdf "Small UML diagram")
+
+An abbreviated UML diagram is shown in Figure~\ref{uml_small}. A full UML diagram is available in `UML.pdf`, or in Appendix D.
+
+The main logic of the game runs in the 'main loop' in `main()`. A single instance of Swarm utilizes many instances of Node, with the entirety of the network simulation done by `example_physical_simulation()`. The simulation is a pure function that operates on the coordinate data from the instances of node in the instance of swarm.
+
+Counterintuitively, nodes do not generate messages directly. This is because I.I.D. assumptions allow us to vectorize message generation outside of node, as well as vectorize the network dynamics through matrix and tensor operations. More advanced simulations might not be able to take advantage of this vectorization.
+
 The architecture of this code is surmised in `README.md` as follows:
 
     ```
-    ├── assets
-    │   │ Contains the one font used in this game.
-    │   │
-    │   └── BitPotion.ttf
-    │
-    ├── main.py
-    │     Contains the `main()` loop and the argument parser.
-    │
-    ├── palette.py
-    │     Contains code for dealing with colors.
-    │     Specifically, GrafxKid's 'Sweetie16' colors palette.
-    │
-    ├── toolkit.py
-    │     Contain the main functionality. Includes Node and Swarm.
-    │ 
-    └─── tests.py
+    |-- assets
+    |   | Contains the one font used in this game.
+    |   |
+    |   +-- BitPotion.ttf
+    |
+    |-- main.py
+    |     Contains the `main()` loop and the argument parser.
+    |
+    |-- palette.py
+    |     Contains code for dealing with colors.
+    |     Specifically, GrafxKid's 'Sweetie16' colors palette.
+    |
+    |-- toolkit.py
+    |     Contain the main functionality. Includes Node and Swarm.
+    | 
+    +--- tests.py
            Contains unit tests and sanity checks.
     ```
 
-An abbreviated UML diagram is as follows:
 
 
 
@@ -212,3 +219,8 @@ We model the physical layer medium only. This means we do not model interface-le
 
 At each timestep $t$, each node $i$ generates a message on channel $k$ with probability $\Delta t$. This corresponds roughly to a Poisson process with $\lambda = 1$. The functionality of the network simulation is vectorized for efficiency, with the logic taking place in the main loop rather than per-node.
 
+
+\newpage
+# Appendix D: Full UML diagram
+
+![The fuller UML diagram.\label{uml_full}](UML.pdf "Small UML diagram"){ height=5.8in }

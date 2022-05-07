@@ -36,7 +36,6 @@ def center_origin(coord, width=360, height=360):
     return (coord[0] + width/2, coord[1] + width/2)
 
 class Node:
-
     def __init__(
         self,
         x = 0,
@@ -142,8 +141,8 @@ class Node:
 class Swarm:
     def __init__(
         self,
-        N: int = 20,
         get_radius = lambda: np.random.normal(200, 30),
+        N: int = 0,
         get_theta  = lambda: np.random.uniform(0, 2*np.pi),
         hist_length = 40,
         screen = None

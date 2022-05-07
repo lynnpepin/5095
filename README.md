@@ -1,6 +1,6 @@
 # Particle Swarm Network Simulator
 
-![Several white nodes on a dark-blue background swim counter-clockwise, a long and fading tail tracing their path. In the top right corner, two matrices of lime-green blinking squares titled "M and A' visualization" blink on and off, lights fading away chaotically. A much more stable square matrix is seen on the bottom right. It is orange and diagonally symmetric, and is titled "D visualization". ](example.gif)
+![Several white nodes on a dark-blue background swim counter-clockwise, a long and fading tail tracing their path. In the top right corner, two matrices of lime-green blinking squares titled "M and A' visualization" blink on and off, lights fading away chaotically. A much more stable square matrix is seen on the bottom right. It is orange and diagonally symmetric, and is titled "D visualization".](example.gif)
 
 This is a toy network simulator, measuring raw broadcast throughput on the physical layer.
 

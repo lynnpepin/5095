@@ -5,6 +5,8 @@ from toolkit import Node, Swarm, example_physical_simulation, polar_to_xy, cente
 
 from palette import S16, s16_raw, interpolate_color
 
+from main import main
+
 class NodeTests(ut.TestCase):
     def test_updated_hist(self):
         for _ in range(10):
@@ -132,6 +134,43 @@ class PaletteTests(ut.TestCase):
                     color2,
                     interpolate_color(color1, color2, r=1)
                 )
+
+class MainTests(ut.TestCase):
+    def test_sanity_main(self):
+        for _ in range(10):
+            main(
+                N = np.random.randint(1,20),
+                K = np.random.randint(1,20),
+                width = np.random.randint(1,1000),
+                height = np.random.randint(1,1000),
+                fps = np.random.randint(1,120),
+                total_time = np.random.random(),
+                simplify_render = (np.random.random() < .5),
+                ratelimit = (np.random.random() < .5)
+            )
+
+    def test_long_main(self):
+        main(
+            N = 4,
+            K = 4,
+            width = 600,
+            height = 600,
+            fps = 10,
+            total_time = 120,
+            ratelimit = False
+        )
+
+    def test_bigg_main(self):
+        main(
+            N = 80,
+            K = 40,
+            width = 600,
+            height = 600,
+            fps = 10,
+            total_time = .5,
+            ratelimit = False
+        )
+                
 
 
 

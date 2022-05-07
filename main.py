@@ -26,7 +26,7 @@ def main(
     height: int = 360,
     fps: int = 60,
     total_time: float = 120,
-    font_fn = "BitPotion.ttf",
+    font_fn = "./assets/BitPotion.ttf",
     simplify_render: bool = False,
     ratelimit: bool = True
 ):
@@ -202,7 +202,7 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         "--font",
-        default=["BitPotion.ttf"],
+        default=["./assets/BitPotion.ttf"],
         help="Font to use when rendering. ",
         type=str, nargs=1)
 

@@ -7,8 +7,11 @@
 | **Date**       | Spring 2022
 | **Student**    | Lynn Pepin
 | **NetID**      | tmp13009, 2079724
-| **Due:**       | May 7th
+| **Due:**       | 2022 May 7th
 
+> **Abstract:** This draft reports on the results of a simple wireless network simulator. We establish $N$ particle-nodes moving in a swarm, communicating over $K$ channels. We model the network as the physical-layer level without any congestion control such as CDCA or exponential backoff. To measure congestion, we measure broadcast throughput (that is, the percent of messages received without interference when broadcast). We find congestion is alleviated by using shorter messages or by having fewer nodes in the network.
+
+\newpage
 # Basic functionality
 
 The goal of this project is to create an advanced particle swam network simulator. This work makes many (intended!) ommissions and simplifications, using a modularity approach combining entity/component/scene composition and functional programming.
@@ -33,6 +36,36 @@ $$\text{Throughput} = \frac{\text{Messages received}}{(N-1)\cdot\text{Messages s
 
 Note the $N-1$ term: This is because one message can be received by all other $N-1$ nodes. 
 
+## Experimental results
+
+We measure the broadcast throughput when varying over $\Delta t$, $N$, and $K$.
+
+**Throughput dependence on timestep:** One weakness of the model is that it assumes every message is sent and received within one timestep. Extending message broadcasts over a window was out of the scope of this proof-of-concept, but because nodes send messages at a fixed rate *per second*, simulations at higher timesteps should have fewer collisions. This means we expect broadcast rate to depend on simulation timestep.
+
+This holds up experimentally. We set $N=60$, $K=10$, and simulate for 20 seconds. We observe this relationship per timestep, noting throughput approaches 100%:
+
+| FPS | $\Delta t$ | throughput |
+| --- | -- | ---------- |
+| 2 | 0.500 | 0.8% |
+| 3 | 0.333 | 1.6% |
+| 6 | 0.167 | 4.4% |
+| 12 | 0.083 | 13.1% |
+| 30 | 0.033 | 39.1% |
+| 60 | 0.017 | 61.9% |
+| 120 | 0.008 | 78.3% |
+
+**Throughput during congestion:** We expect our model to show the impact of congestion on a network. Keeping $K=32$ and $\Delta T=\frac{1}{30}$, we measure the throughput for different values of $N$. We expect to see a decrease in throughput, and this is observed:
+
+| N | throughput |
+| - | ---------- |
+| 2 | 100.0% |
+| 4 | 97.0% |
+| 8 | 90.4% |
+| 16 | 78.9% |
+| 32 | 60.8% |
+| 64 | 36.7% |
+| 128 | 16.6% |
+
 
 ## Design Principles 
 
@@ -44,7 +77,6 @@ Because functional patterns are used so extensively, this makes the code unit te
 
 [^functional]: Here, *functional* refers to the *functional programming paradigm.* Functional paradigms have a multitude of advantages for code readability, testibility, composability, and modularity. 
 
-\newpage
 ### ECS-Functional Example
 
 For example, each particle *entity* moves according to a system of differential equations  $\left(\frac{dr}{\Delta t}, \frac{d\theta}{\Delta t}\right)$. These equations (and their parameters) are individual *entities*.
@@ -90,28 +122,6 @@ An abbreviated UML diagram is shown in Figure~\ref{uml_small}. A full UML diagra
 The main logic of the game runs in the 'main loop' in `main()`. A single instance of Swarm utilizes many instances of Node, with the entirety of the network simulation done by `example_physical_simulation()`. The simulation is a pure function that operates on the coordinate data from the instances of node in the instance of swarm.
 
 Counterintuitively, nodes do not generate messages directly. This is because I.I.D. assumptions allow us to vectorize message generation outside of node, as well as vectorize the network dynamics through matrix and tensor operations. More advanced simulations might not be able to take advantage of this vectorization.
-
-The architecture of this code is surmised in `README.md` as follows:
-
-    ```
-    |-- assets
-    |   | Contains the one font used in this game.
-    |   |
-    |   +-- BitPotion.ttf
-    |
-    |-- main.py
-    |     Contains the `main()` loop and the argument parser.
-    |
-    |-- palette.py
-    |     Contains code for dealing with colors.
-    |     Specifically, GrafxKid's 'Sweetie16' colors palette.
-    |
-    |-- toolkit.py
-    |     Contain the main functionality. Includes Node and Swarm.
-    | 
-    +--- tests.py
-           Contains unit tests and sanity checks.
-    ```
 
 
 
@@ -224,3 +234,26 @@ At each timestep $t$, each node $i$ generates a message on channel $k$ with prob
 # Appendix D: Full UML diagram
 
 ![The fuller UML diagram.\label{uml_full}](UML.pdf "Small UML diagram"){ height=5.8in }
+
+\newpage
+The architecture of this code is surmised in `README.md` as follows:
+
+    ```
+    |-- assets
+    |   | Contains the one font used in this game.
+    |   |
+    |   +-- BitPotion.ttf
+    |
+    |-- main.py
+    |     Contains the `main()` loop and the argument parser.
+    |
+    |-- palette.py
+    |     Contains code for dealing with colors.
+    |     Specifically, GrafxKid's 'Sweetie16' colors palette.
+    |
+    |-- toolkit.py
+    |     Contain the main functionality. Includes Node and Swarm.
+    | 
+    +--- tests.py
+           Contains unit tests and sanity checks.
+    ```

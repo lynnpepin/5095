@@ -28,7 +28,7 @@ def main(
     total_time: float = 120,
     font_fn = "./assets/BitPotion.ttf",
     simplify_render: bool = False,
-    ratelimit: bool = True
+    ratelimit: bool = True,
 ):
     """Run the network experiment on the particle swarm.
 
@@ -52,10 +52,11 @@ def main(
     :type font_fn: str, optional
     :param simplify_render: Turn off tails and graphs, defaults to False
     :type simplify_render: bool, optional
+    # Note: simplify_render will remove printing and ALL rendering if set to 2
     :param ratelimit: Slow the simulation rendering if it runs faster than the display, defaults to True
     :type ratelimit: bool, optional
-    :return: Returns 0 on exit
-    :rtype: int
+    :return: Returns throughput rate on exit
+    :rtype: float
     """
     # See https://dr0id.bitbucket.io/legacy/pygame_tutorial00.html
     pygame.init()
@@ -89,11 +90,12 @@ def main(
         
         #### Handle physical simulation
         swarm.update(dt=dt)
-        swarm.draw(
-            screen,
-            transform = lambda coord: center_origin(coord, width, height),
-            tail = not simplify_render
-        )
+        if simplify_render < 2:
+            swarm.draw(
+                screen,
+                transform = lambda coord: center_origin(coord, width, height),
+                tail = not simplify_render
+            )
 
         #### Handle network simulation
         coordinates = np.zeros((N,2))
@@ -144,15 +146,16 @@ def main(
             clock.tick(fps)
             
         pygame.display.update()
-        pygame.image.save(screen, f"/dev/shm/{ti:>04}.png")
     
     # broadcast throughput
     sum_recv = sum(cum_tot_recv)
     sum_sent = sum(cum_tot_sent)
     throughput = sum_recv/(sum_sent*(N-1))
-    print("Broadcast throughput:")
-    print(f"{sum_recv} recv/({sum_sent} sent*(N-1)) = {100*throughput:.1f}%")
-    return 0
+    if simplify_render < 2:
+        print("Broadcast throughput:")
+        print(f"{sum_recv} recv/({sum_sent} sent*(N-1)) = {100*throughput:.1f}%")
+
+    return throughput
 
 
 

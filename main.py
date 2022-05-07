@@ -10,6 +10,8 @@ import sys
 import matplotlib
 import numpy as np
 
+from os import environ
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import pygame
 from pygame import freetype
 
@@ -71,8 +73,12 @@ def main(
     swarm = Swarm(N=N, screen=screen, hist_length=int(1/(2*dt)))
     M_to_draw = np.zeros((N,K))
     Ar_to_draw = np.zeros((N,K))
+    
+    cum_tot_sent = []
+    cum_tot_recv = []
 
-    tt = 0
+    tt = 0 # timestep
+    ti = 0 # time index
     while tt < total_time:
         screen.fill(S16.black)
 
@@ -96,6 +102,9 @@ def main(
         
         tot_sent, tot_recv, M, D, _, Ar = example_physical_simulation(coordinates, dt, K)
 
+        cum_tot_sent.append(tot_sent)
+        cum_tot_recv.append(tot_recv)
+
         if not simplify_render:
             #### Draw metadata
             # Draw M and Ar here
@@ -111,7 +120,7 @@ def main(
                 _normalize_safe(Ar) + (1-dt*6) * Ar_to_draw,
                 0, 1
             )
-            draw_M(corner=(13 + K*4, 16), M=Ar_to_draw.T, screen=screen, width=3)
+            draw_M(corner=(13 + K*4, 16), M=Ar_to_draw.T, C1=S16.cyan, screen=screen, width=3)
 
             # Draw D graph text
             D_corner=(width - N*3 - 4, height-N*3 - 4)
@@ -130,10 +139,19 @@ def main(
         # fixed dt = visual inconsistency but simulated consistency
         # setting dt as `dt = clock.tick(FPS)/1000` gives us the opposite
         tt += dt
+        ti += 1
         if ratelimit:
             clock.tick(fps)
             
         pygame.display.update()
+        pygame.image.save(screen, f"/dev/shm/{ti:>04}.png")
+    
+    # broadcast throughput
+    sum_recv = sum(cum_tot_recv)
+    sum_sent = sum(cum_tot_sent)
+    throughput = sum_recv/(sum_sent*(N-1))
+    print("Broadcast throughput:")
+    print(f"{sum_recv} recv/({sum_sent} sent*(N-1)) = {100*throughput:.1f}%")
     return 0
 
 
@@ -195,8 +213,6 @@ if __name__ == '__main__':
         action="store_true"
     )
 
-
-
     args = parser.parse_args()
 
     main(
@@ -209,5 +225,4 @@ if __name__ == '__main__':
         total_time=args.totaltime[0],
         simplify_render=args.simple,
         ratelimit = not args.noratelimit
-
     )
